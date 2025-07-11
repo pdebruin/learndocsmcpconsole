@@ -1,58 +1,40 @@
-using ModelContextProtocol;
-using ModelContextProtocol.Client;
+using OpenAI;
+using OpenAI.Chat;
+using System.ClientModel;
 
 class Githubmodel
 {
     public static async Task Main(string[] args)
     {
-        System.Console.WriteLine("Running the MCP client example with a GitHub model...");
 
-        // Create an MCP client using the Stdio transport
-        // IMcpClient mcpClient = await McpClientFactory.CreateAsync(
-        //     new StdioClientTransport(new()
-        //     {
-        //         Command = "npx",
-        //         Arguments = [
-        //       "-y",
-        //       "mcp-remote",
-        //       "https://learn.microsoft.com/api/mcp"
-        //     ],
-        //         Name = "Learn Docs MCP Server",
-        //     }));
+// TODO: merge with https://github.com/modelcontextprotocol/csharp-sdk/blob/main/samples/ChatWithTools/Program.cs
 
-        // Create an MCP client using the HTTP transport
-        IMcpClient mcpClient = await McpClientFactory.CreateAsync(
-            new SseClientTransport(new()
-            {
-                Endpoint = new Uri("https://learn.microsoft.com/api/mcp"),
-                Name = "Learn Docs MCP Server",
-                TransportMode = HttpTransportMode.StreamableHttp,
-            }));
+        var endpoint = "https://models.github.ai/inference";
+var credential = System.Environment.GetEnvironmentVariable("GITHUB_TOKEN");
+var model = "openai/gpt-4o";
 
-        // List all available tools from the MCP server.
-        Console.WriteLine("Available tools:");
-        IList<McpClientTool> tools = await mcpClient.ListToolsAsync();
-        foreach (McpClientTool tool in tools)
-        {
-            Console.WriteLine($"{tool}");
-        }
-        Console.WriteLine();
+var openAIOptions = new OpenAIClientOptions()
+{
+    Endpoint = new Uri(endpoint)
 
-        // Set the specific tool to call
-        var toolName = "microsoft_docs_search";
+};
 
-        // Define the arguments for the tool call
-        IReadOnlyDictionary<string, object> toolArguments = new Dictionary<string, object>()
-        {
-            { "question", "how to create an Azure storage account using az cli?" }
-        };
+var client = new ChatClient(model, new ApiKeyCredential(credential), openAIOptions);
 
-        var response = await mcpClient.CallToolAsync(toolName, toolArguments!);
+List<ChatMessage> messages = new List<ChatMessage>()
+{
+    new SystemChatMessage("You are a helpful assistant."),
+    new UserChatMessage("What is the capital of France?"),
+};
 
-        Console.WriteLine("Response from MCP server:");
-        foreach (var res in response.Content)
-        {
-            Console.WriteLine($"Tool Result: {res.ToAIContent()}");
-        }
+var requestOptions = new ChatCompletionOptions()
+{
+    Temperature = 1.0f,
+    TopP = 1.0f,
+    MaxOutputTokenCount = 1000
+};
+
+var response = client.CompleteChat(messages, requestOptions);
+System.Console.WriteLine(response.Value.Content[0].Text);
     }
 }
