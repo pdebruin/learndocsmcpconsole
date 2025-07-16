@@ -10,7 +10,7 @@ using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
 
-class Openai
+class SkPlugin
 {
     public static async Task Run(string[] args)
     {
@@ -48,7 +48,7 @@ class Openai
 
         Kernel kernel = builder.Build();
 
-        kernel.Plugins.AddFromFunctions("GitHub", tools.Select(aiFunction => aiFunction.AsKernelFunction()));
+        kernel.Plugins.AddFromFunctions("Learn", tools.Select(aiFunction => aiFunction.AsKernelFunction()));
 
         // Enable automatic function calling
         OpenAIPromptExecutionSettings executionSettings = new()
@@ -57,7 +57,7 @@ class Openai
             FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(options: new() { RetainArgumentTypes = true })
         };
 
-        // Test using GitHub tools
+        // Test using Learn tools
         var prompt = "how to create an Azure storage account using az cli?";
         var result = await kernel.InvokePromptAsync(prompt, new(executionSettings)).ConfigureAwait(false);
         Console.WriteLine($"\n\n{prompt}\n{result}");

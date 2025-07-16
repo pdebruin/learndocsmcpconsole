@@ -1,7 +1,7 @@
 using ModelContextProtocol;
 using ModelContextProtocol.Client;
 
-class Simple
+class CallTool
 {
     public static async Task Run(string[] args)
     {
@@ -49,7 +49,6 @@ class Simple
 
         var response = await mcpClient.CallToolAsync(toolName, toolArguments!);
 
-        Console.WriteLine("Response from MCP server:");
         foreach (var res in response.Content)
         {
             Console.WriteLine($"Tool Result: {res.ToAIContent()}");

@@ -2,7 +2,7 @@ using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
 
-class Githubmodel
+class StreamChat
 {
     public static async Task Run(string[] args)
     {

@@ -12,13 +12,13 @@ switch (userinput)
 {
     case "1":
         // Call the method to list available tools
-        Simple.Run(args).GetAwaiter().GetResult();
+        CallTool.Run(args).GetAwaiter().GetResult();
         break;
     case "2":
-        Githubmodel.Run(args).GetAwaiter().GetResult();
+        StreamChat.Run(args).GetAwaiter().GetResult();
         break;
     case "3":
-        Openai.Run(args).GetAwaiter().GetResult();
+        SkPlugin.Run(args).GetAwaiter().GetResult();
         break;
     default:
         Console.WriteLine("Invalid option. Please try again.");
