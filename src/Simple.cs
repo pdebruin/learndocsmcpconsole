@@ -3,7 +3,7 @@ using ModelContextProtocol.Client;
 
 class Simple
 {
-    public static async Task Main(string[] args)
+    public static async Task Run(string[] args)
     {
         System.Console.WriteLine("Running the simple MCP client example...");
 

@@ -4,18 +4,17 @@ using System.ClientModel;
 
 class Githubmodel
 {
-    public static async Task Main(string[] args)
+    public static async Task Run(string[] args)
     {
         // TODO: merge with https://github.com/modelcontextprotocol/csharp-sdk/blob/main/samples/ChatWithTools/Program.cs
 
         var endpoint = "https://models.github.ai/inference";
         var credential = System.Environment.GetEnvironmentVariable("GITHUB_TOKEN");
-        var model = "openai/gpt-4o";
+        var model = "openai/gpt-4o-mini";
 
         var openAIOptions = new OpenAIClientOptions()
         {
             Endpoint = new Uri(endpoint)
-
         };
 
         var client = new ChatClient(model, new ApiKeyCredential(credential), openAIOptions);
@@ -33,7 +32,7 @@ class Githubmodel
             MaxOutputTokenCount = 1000
         };
 
-        var response = client.CompleteChat(messages, requestOptions);
+        var response = await client.CompleteChatAsync(messages, requestOptions);
         System.Console.WriteLine(response.Value.Content[0].Text);
     }
 }

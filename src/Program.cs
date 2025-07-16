@@ -1,6 +1,7 @@
 ﻿Console.WriteLine("Hello, learndocsmcpconsole. You can choose from the following options:");
 Console.WriteLine("1. Run the simple MCP client example");
 Console.WriteLine("2. Run the MCP client example with a GitHub model");
+Console.WriteLine("3. Run the SK client example with GitHub model");
 
 string? userinput = Console.ReadLine();
 
@@ -11,11 +12,13 @@ switch (userinput)
 {
     case "1":
         // Call the method to list available tools
-        Simple.Main(args).GetAwaiter().GetResult();
-        Console.WriteLine("Listed available tools successfully.");
+        Simple.Run(args).GetAwaiter().GetResult();
         break;
     case "2":
-        Githubmodel.Main(args).GetAwaiter().GetResult();
+        Githubmodel.Run(args).GetAwaiter().GetResult();
+        break;
+    case "3":
+        Openai.Run(args).GetAwaiter().GetResult();
         break;
     default:
         Console.WriteLine("Invalid option. Please try again.");
