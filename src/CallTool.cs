@@ -5,21 +5,6 @@ class CallTool
 {
     public static async Task Run(string[] args)
     {
-        System.Console.WriteLine("Running the simple MCP client example...");
-
-        // Create an MCP client using the Stdio transport
-        // IMcpClient mcpClient = await McpClientFactory.CreateAsync(
-        //     new StdioClientTransport(new()
-        //     {
-        //         Command = "npx",
-        //         Arguments = [
-        //       "-y",
-        //       "mcp-remote",
-        //       "https://learn.microsoft.com/api/mcp"
-        //     ],
-        //         Name = "Learn Docs MCP Server",
-        //     }));
-
         // Create an MCP client using the HTTP transport
         IMcpClient mcpClient = await McpClientFactory.CreateAsync(
             new SseClientTransport(new()

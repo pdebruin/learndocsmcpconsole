@@ -1,0 +1,113 @@
+AZURE_AI_FOUNDRY_PROJECT_ENDPOINT=
+AGENT_TOKEN=
+API_VERSION="2025-05-15-preview"
+
+curl -g --request POST \
+  --url $AZURE_AI_FOUNDRY_PROJECT_ENDPOINT/assistants?api-version=$API_VERSION \
+  -H "Authorization: Bearer $AGENT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"instructions\": \"You are a customer support chatbot. Use the tools provided and your knowledge base to best respond to customer queries.\",
+    \"tools\": [
+          {
+              \"type\": \"mcp\",
+              \"server_label\": \"LearnMCP\",
+              \"server_url\": \"https://learn.microsoft.com/api/mcp\"
+          }
+      ],
+  \"name\": \"my-assistant\",
+  \"model\": \"gpt-4o\"
+}"
+
+curl --request POST \
+  --url $AZURE_AI_FOUNDRY_PROJECT_ENDPOINT/threads?api-version=$API_VERSION \
+  -H "Authorization: Bearer $AGENT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d ''
+
+  curl --request POST \
+  --url $AZURE_AI_FOUNDRY_PROJECT_ENDPOINT/threads/thread_abc123/messages?api-version=$API_VERSION \
+  -H "Authorization: Bearer $AGENT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+      "role": "user",
+      "content": "<user input related to the MCP server you connect>"
+    }'
+
+curl --request POST \
+  --url $AZURE_AI_FOUNDRY_PROJECT_ENDPOINT/threads/thread_abc123/runs?api-version=$API_VERSION \
+  -H "Authorization: Bearer $AGENT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+      "assistant_id": "<agent_id>",
+      "tool_resources": {
+          "mcp": [
+            {
+                "server_label": "<the same unique name you provided during agent creation>",
+    "require_approval": "always" #always by default
+                "headers": {
+                    "Authorization": "Bearer <token>",
+                }
+
+            }
+          ]
+      },
+    }'
+
+
+curl --request GET \
+  --url $AZURE_AI_FOUNDRY_PROJECT_ENDPOINT/threads/thread_abc123/runs/run_abc123?api-version=$API_VERSION \
+  -H "Authorization: Bearer $AGENT_TOKEN"
+
+{
+  "id": "run_123",
+  "object": "thread.run",
+  ...
+  "status": "requires_action",
+  ...
+  "required_action": {
+    "type": "submit_tool_approval",
+    "submit_tool_approval": {
+      "tool_calls": [
+        {
+          "id": "call_123",
+          "type": "mcp",
+          "arguments": "{...}",
+          "name": "<tool_name>",
+          "server_label": "<server_label_you_provided>"
+        }
+      ]
+    }
+  },
+  ...
+  "tools": [
+    {
+      "type": "mcp",
+      "server_label": "<server_label_you_provided>",
+      "server_url": "<server_url_you_provided>",
+      "allowed_tools": null
+    }
+  ],
+ ...
+}
+
+curl --request POST \
+  --url $AZURE_AI_FOUNDRY_PROJECT_ENDPOINT/threads/thread_abc123/runs/run_abc123/submit_tool_outputs?api-version=$API_VERSION \
+  -H "Authorization: Bearer $AGENT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "tool_approvals": [
+        {
+            "tool_call_id": "call_abc123",
+            "approve": true,
+            "headers": {
+            }
+        }
+    ]
+}
+
+curl --request GET \
+  --url $AZURE_AI_FOUNDRY_PROJECT_ENDPOINT/threads/thread_abc123/messages?api-version=$API_VERSION \
+  -H "Authorization: Bearer $AGENT_TOKEN"
+
+

@@ -5,9 +5,6 @@ Console.WriteLine("3. Run the SK client example with GitHub model");
 
 string? userinput = Console.ReadLine();
 
-// using ModelContextProtocol;
-// using ModelContextProtocol.Client;
-
 switch (userinput)
 {
     case "1":
@@ -15,7 +12,7 @@ switch (userinput)
         CallTool.Run(args).GetAwaiter().GetResult();
         break;
     case "2":
-        StreamChat.Run(args).GetAwaiter().GetResult();
+        AIInference.Run(args).GetAwaiter().GetResult();
         break;
     case "3":
         SkPlugin.Run(args).GetAwaiter().GetResult();
