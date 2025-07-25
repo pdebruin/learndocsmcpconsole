@@ -8,6 +8,7 @@ class AIInference
 {
     public static async Task Run(string[] args)
     {
+        // https://learn.microsoft.com/en-us/dotnet/ai/quickstarts/build-mcp-client
         // https://www.nuget.org/packages/Microsoft.Extensions.AI.AzureAIInference/
         // https://github.com/modelcontextprotocol/csharp-sdk/blob/main/samples/ChatWithTools/Program.cs
         IMcpClient mcpClient = await McpClientFactory.CreateAsync(
@@ -27,15 +28,17 @@ class AIInference
         var endpoint = "https://models.github.ai/inference";
         var credential = System.Environment.GetEnvironmentVariable("GITHUB_TOKEN");
         var model = "openai/gpt-4o-mini";
+        
+        if (string.IsNullOrEmpty(credential))
+            throw new InvalidOperationException("GITHUB_TOKEN environment variable is not set.");
 
-        IChatClient client = new Azure.AI.Inference.ChatCompletionsClient(
-            new(endpoint),
-            new AzureKeyCredential(credential))
-            .AsIChatClient(model);
-
-        IChatClient chatClient = new ChatClientBuilder(client)
-        .UseFunctionInvocation()
-        .Build();
+        IChatClient chatClient =
+            new ChatClientBuilder(
+                new ChatCompletionsClient(new Uri(endpoint),
+                new AzureKeyCredential(credential))
+                .AsIChatClient(model))
+            .UseFunctionInvocation()
+            .Build();
 
         ChatOptions chatOptions = new()
         {

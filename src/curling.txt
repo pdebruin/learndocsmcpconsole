@@ -1,3 +1,5 @@
+https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/model-context-protocol-samples?pivots=rest
+
 AZURE_AI_FOUNDRY_PROJECT_ENDPOINT=
 AGENT_TOKEN=
 API_VERSION="2025-05-15-preview"

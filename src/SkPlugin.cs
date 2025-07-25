@@ -30,25 +30,21 @@ class SkPlugin
         var credential = System.Environment.GetEnvironmentVariable("GITHUB_TOKEN");
         var model = "openai/gpt-4o-mini";
 
+        if (string.IsNullOrWhiteSpace(credential))
+            throw new InvalidOperationException("GITHUB_TOKEN environment variable is not set.");
+
         var client = new OpenAIClient(new ApiKeyCredential(credential), new OpenAIClientOptions { Endpoint = new Uri(endpoint) });
         var builder = Kernel.CreateBuilder();
         builder.AddOpenAIChatCompletion(model, client);
-
         Kernel kernel = builder.Build();
         kernel.Plugins.AddFromFunctions("LearnMcpPlugin", tools.Select(aiFunction => aiFunction.AsKernelFunction()));
 
-        // Enable automatic function calling
         OpenAIPromptExecutionSettings executionSettings = new()
         {
             Temperature = 0,
             FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(options: new() { RetainArgumentTypes = true })
         };
 
-        var prompt = "How to create an Azure storage account using az cli?";
-        var result = await kernel.InvokePromptAsync(prompt, new(executionSettings)).ConfigureAwait(false);
-        Console.WriteLine($"\n\n{prompt}\n{result}");
-
-        // Define the agent
         ChatCompletionAgent agent = new()
         {
             Instructions = "Answer questions about Microsoft products, services and technologies",
@@ -57,8 +53,10 @@ class SkPlugin
             Arguments = new KernelArguments(executionSettings),
         };
 
-        // Respond to user input, invoking functions where appropriate.
-        ChatMessageContent response = await agent.InvokeAsync("How to create an Azure storage account using az cli?").FirstAsync();
-        Console.WriteLine($"\n\nResponse from LearnAgent:\n{response.Content}");
+        var prompt = "How to create an Azure storage account using az cli?";
+        await foreach (var content in agent.InvokeStreamingAsync(prompt))
+        {
+            Console.Write(content.Message);
+        }
     }
 }
