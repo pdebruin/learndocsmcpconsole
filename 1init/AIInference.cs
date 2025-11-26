@@ -3,6 +3,7 @@ using Azure.AI.Inference;
 using Microsoft.Extensions.AI;
 using ModelContextProtocol.Client;
 using System.ClientModel;
+using System.Linq;
 
 class AIInference
 {
@@ -40,12 +41,13 @@ class AIInference
             .UseFunctionInvocation()
             .Build();
 
-        ChatOptions chatOptions = new()
-        {
-            Tools = [.. tools]
-        };
+        // Summarize tools to avoid sending large tool metadata to the model (token limit).
+        var toolNames = string.Join(", ", tools.Select(t => t.Name).Take(50));
+        var prompt = $"Available tools: {toolNames}\n\nHow to create an Azure storage account using az cli?";
 
-        await foreach (var message in chatClient.GetStreamingResponseAsync("How to create an Azure storage account using az cli?", chatOptions))
+        var chatOptions = new ChatOptions();
+
+        await foreach (var message in chatClient.GetStreamingResponseAsync(prompt, chatOptions))
         {
             Console.Write(message);
         }
